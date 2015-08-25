@@ -14,10 +14,6 @@ require_once '../tools/PHPExcel/Classes/PHPExcel/IOFactory.php';
 /** Include Define **/
 require_once("inc_db.php");
 
-$db_selected = mysql_select_db('netpoint_media', $conn);
-if (!$db_selected) {
-	die ('Kann netpoint_online nicht benutzen : ' . mysql_error());
-}
 // Create new PHPExcel object
 //echo date('H:i:s') , " Create new PHPExcel object" , EOL;
 $objPHPExcel = new PHPExcel();
@@ -46,12 +42,50 @@ $clone = clone $sheet2;
 $clone->setTitle('clone');
 $objPHPExcel->addSheet($clone);
 
+$status = true;
+$subchannel = null;
+$portid = null;
+$portcount2 = null;
+$portcount = null;
 
 //ToDo
 function createxls($show_imp = false,$show_view = false,$show_unique = false,	$strPath)
 {
 		global $objPHPExcel;
 		global $clone;
+		global $status;
+		global $sheetEx;
+
+		if($status==false){
+			//echo "status: false",EOL;
+			$objPHPExcel = new PHPExcel();
+
+			// Set document properties
+			//echo date('H:i:s') , " Set document properties" , EOL;
+			$objPHPExcel->getProperties()->setCreator("netpoint-media")
+										 ->setLastModifiedBy("netpoint-media")
+										 ->setTitle("PHPExcel Test Document")
+										 ->setSubject("PHPExcel Test Document")
+										 ->setDescription("Test document for PHPExcel, generated using PHP classes.")
+										 ->setKeywords("office PHPExcel php")
+										 ->setCategory("Test result file");
+
+			$objPHPExcel2 = PHPExcel_IOFactory::load("excel/deckblatt.xlsx");
+			foreach ($objPHPExcel2->getAllSheets() as $worksheet) {
+					$objPHPExcel->AddExternalSheet($worksheet);
+			}
+
+			$objPHPExcel->setActiveSheetIndex(2);
+			//Clone worksheet index 2
+			$sheet2 = $objPHPExcel->getActiveSheet()->copy();
+
+			//Add Clone worksheet
+			$clone = clone $sheet2;
+			$clone->setTitle('clone');
+			$objPHPExcel->addSheet($clone);
+
+		}
+
 		//Arbeitsblatt technik
 		$objPHPExcel->setActiveSheetIndex(2);
 		{
@@ -199,7 +233,7 @@ function createxls($show_imp = false,$show_view = false,$show_unique = false,	$s
 			{
 				$c++;
 				$colIndex = PHPExcel_Cell::stringFromColumnIndex($c);
-			  $objPHPExcel->getActiveSheet()->getColumnDimension($colIndex)->setWidth(16);
+			  	$objPHPExcel->getActiveSheet()->getColumnDimension($colIndex)->setWidth(16);
 				$objPHPExcel->getActiveSheet()->getCellByColumnAndRow($c,$r)->setValue("PageImpressions pro Monat");
 				$objPHPExcel->getActiveSheet()->getStyle($colIndex.$r)->getAlignment()->setWrapText(true);
 			}
@@ -350,10 +384,11 @@ function createxls($show_imp = false,$show_view = false,$show_unique = false,	$s
 		$objPHPExcel->setActiveSheetIndex(5);
 		{
 			$objPHPExcel->getActiveSheet()->getRowDimension(1)->setRowHeight(36);
+			$objPHPExcel->getActiveSheet()->getRowDimension(2)->setRowHeight(25.5);
 			$objPHPExcel->getActiveSheet()->getColumnDimension('A')->setWidth(36);
-		  $objPHPExcel->getActiveSheet()->getColumnDimension('B')->setWidth(16);
-		  $objPHPExcel->getActiveSheet()->getColumnDimension('C')->setWidth(9);
-		  $objPHPExcel->getActiveSheet()->getColumnDimension('D')->setWidth(22);
+		  	$objPHPExcel->getActiveSheet()->getColumnDimension('B')->setWidth(16);
+		  	$objPHPExcel->getActiveSheet()->getColumnDimension('C')->setWidth(9);
+		  	$objPHPExcel->getActiveSheet()->getColumnDimension('D')->setWidth(22);
 
 			$styleArray = array(
 		    'font'  => array(
@@ -370,9 +405,9 @@ function createxls($show_imp = false,$show_view = false,$show_unique = false,	$s
 					          )
 				    )
 			);
-		  $objPHPExcel->getActiveSheet()->getCell('A2')->setValue('Themen-Rotation');
+		  	$objPHPExcel->getActiveSheet()->getCell('A2')->setValue('Themen-Rotation');
 			$objPHPExcel->getActiveSheet()->getCell('B2')->setValue('PI in Mio. / Monat');
-		  $objPHPExcel->getActiveSheet()->getStyle('A2:B2')->applyFromArray($styleArray);
+		  	$objPHPExcel->getActiveSheet()->getStyle('A2:B2')->applyFromArray($styleArray);
 
 			$result = mysql_query("SELECT SUM(PI_Rubrik) sum,Name,Linkname,vermarktung,Website,portfolio.status,rotation.Linkname FROM rotation,rubriken,portfolio WHERE Art='thema' AND portfolio.Port_ID=rubriken.Port_ID AND portfolio.status='online' AND rubriken.Rot_ID=rotation.Rot_ID AND rotation.Name NOT LIKE '%_neu_%' AND rotation.status = '1' GROUP BY Name");
 
@@ -380,8 +415,11 @@ function createxls($show_imp = false,$show_view = false,$show_unique = false,	$s
 			$counter = 0;
 			$r=2;
 			$r++;
+			$sheetEx = 6;
+
 			while($row = @mysql_fetch_array($result))
 			{
+				$objPHPExcel->setActiveSheetIndex(5);
 				$objPHPExcel->getActiveSheet()->getCell('A'.$r)->setValue($row['Name']);
 				//change the data type of the cell
 				$objPHPExcel->getActiveSheet()->getCell('A'.$r)->setDataType(PHPExcel_Cell_DataType::TYPE_STRING2);
@@ -403,8 +441,10 @@ function createxls($show_imp = false,$show_view = false,$show_unique = false,	$s
 				$r++;
 				//print_r($row['Linkname']);
 				//echo $show_imp,EOL,$show_view,EOL,$show_unique,EOL;
-				//rotation($row['Linkname'],$show_imp,$show_view,$show_unique);
+				rotation($sheetEx, $row['Linkname'],$show_imp,$show_view,$show_unique);
+				$sheetEx++;
 			}
+			$objPHPExcel->setActiveSheetIndex(5);
 			$styleArray2 = array(
 				'fill' => array(
 		            'type' => PHPExcel_Style_Fill::FILL_SOLID,
@@ -423,7 +463,7 @@ function createxls($show_imp = false,$show_view = false,$show_unique = false,	$s
 		}
 
 		//Add worksheet netpoint-rotation
-		$sheet5 = clone $clone;
+		/*$sheet5 = clone $clone;
 		$sheet5->setTitle('netpoint-rotation');
 		$objPHPExcel->addSheet($sheet5);
 
@@ -478,8 +518,8 @@ function createxls($show_imp = false,$show_view = false,$show_unique = false,	$s
 				)
 			);
 			$objPHPExcel->getActiveSheet()->getStyle("A2:G2")->applyFromArray($center);
-
-		}
+			
+		}*/
 		// Set active sheet index to the first sheet, so Excel opens this as the first sheet
 		$objPHPExcel->setActiveSheetIndex(1);
 
@@ -502,10 +542,265 @@ function createxls($show_imp = false,$show_view = false,$show_unique = false,	$s
 		}
 		$objWriter->save(str_replace('.php', '.xlsx', $strPath));
 
-		echo $strPath,EOL;
+		$status = false;
+		//echo $strPath,EOL;
 }
-function rotation($rotid,$show_imp = false,$show_view = false,$show_unique = false)
+function rotation($sheetEx, $rotid,$show_imp = false,$show_view = false,$show_unique = false)
 {
+	global $clone;
+	global $objPHPExcel;
+	global $subchannel;
+	global $portid;
+	global $portcount2;
+	global $portcount;
+	
+	//echo "rotid ".$rotid,EOL;
+
+	//Add worksheet netpoint-rotation	
+	$sheet5 = clone $clone;
+	$sheet5->setTitle("Worksheet");
+	$objPHPExcel->addSheet($sheet5);
+	//echo $sheetEx,EOL;
+	$objPHPExcel->setActiveSheetIndex($sheetEx);
+
+	$objPHPExcel->getActiveSheet()->getRowDimension(1)->setRowHeight(36);
+	$objPHPExcel->getActiveSheet()->getRowDimension(2)->setRowHeight(25.5);
+
+	$c = 0;
+	$r = 2;
+
+	$colIndex = PHPExcel_Cell::stringFromColumnIndex($c);
+	$objPHPExcel->getActiveSheet()->getColumnDimension($colIndex)->setWidth(36);
+	$objPHPExcel->getActiveSheet()->getCellByColumnAndRow($c,$r)->setValue("Portfolio / Website");
+	//echo "Portfolio / Website: ".$colIndex,EOL;
+	
+	$c++;
+	$colIndex = PHPExcel_Cell::stringFromColumnIndex($c);
+	$objPHPExcel->getActiveSheet()->getColumnDimension($colIndex)->setWidth(25);
+	$objPHPExcel->getActiveSheet()->getCellByColumnAndRow($c,$r)->setValue("Platzierung");
+
+	if($show_imp)
+	{
+		$c++;
+		$colIndex = PHPExcel_Cell::stringFromColumnIndex($c);
+		$objPHPExcel->getActiveSheet()->getColumnDimension($colIndex)->setWidth(16);
+		if($rotid==45)
+		{
+			$objPHPExcel->getActiveSheet()->getCellByColumnAndRow($c,$r)->setValue("Reichweite");
+		}else{
+			$objPHPExcel->getActiveSheet()->getCellByColumnAndRow($c,$r)->setValue("PageImpressions pro Monat");
+			$objPHPExcel->getActiveSheet()->getStyle($colIndex.$r)->getAlignment()->setWrapText(true);
+		}
+	}
+	if($show_view && $rotid!=45)
+	{
+		$c++;
+		$colIndex = PHPExcel_Cell::stringFromColumnIndex($c);
+		$objPHPExcel->getActiveSheet()->getColumnDimension($colIndex)->setWidth(16);
+		$objPHPExcel->getActiveSheet()->getCellByColumnAndRow($c,$r)->setValue("Visits               pro Monat");
+		$objPHPExcel->getActiveSheet()->getStyle($colIndex.$r)->getAlignment()->setWrapText(true);
+	}
+	if($show_unique && $rotid!=45)
+	{
+		$c++;
+		$colIndex = PHPExcel_Cell::stringFromColumnIndex($c);
+		$objPHPExcel->getActiveSheet()->getColumnDimension($colIndex)->setWidth(16);
+		$objPHPExcel->getActiveSheet()->getCellByColumnAndRow($c,$r)->setValue("Unique User               pro Monat");
+		$objPHPExcel->getActiveSheet()->getStyle($colIndex.$r)->getAlignment()->setWrapText(true);
+	}
+	$c++;
+	$colIndex = PHPExcel_Cell::stringFromColumnIndex($c);
+	$objPHPExcel->getActiveSheet()->getColumnDimension($colIndex)->setWidth(35);
+	$objPHPExcel->getActiveSheet()->getCellByColumnAndRow($c,$r)->setValue("Website- & Zielgruppenbeschreibung");
+	$objPHPExcel->getActiveSheet()->getStyle($colIndex.$r)->getAlignment()->setWrapText(true);
+
+	$c++;
+	$colIndex = PHPExcel_Cell::stringFromColumnIndex($c);
+	$objPHPExcel->getActiveSheet()->getColumnDimension($colIndex)->setWidth(35);
+	$objPHPExcel->getActiveSheet()->getCellByColumnAndRow($c,$r)->setValue("Channel-Beschreibung / Buchungsmoeglichkeiten & Preise");
+	$objPHPExcel->getActiveSheet()->getStyle($colIndex.$r)->getAlignment()->setWrapText(true);
+
+	$styleArray = array(
+		    'font'  => array(
+		        'bold'  => false,
+		        'color' => array('rgb' => 'FFFFFF')
+		    ),
+				'fill' => array(
+		            'type' => PHPExcel_Style_Fill::FILL_SOLID,
+		            'color' => array('rgb' => '000000')
+		        ),
+				'borders' => array(
+				        'allborders' => array(
+				            'style' => PHPExcel_Style_Border::BORDER_THIN
+					          )
+				    )
+			);
+
+	$objPHPExcel->getActiveSheet()->getStyle("A2:".$colIndex."2")->applyFromArray($styleArray);
+
+	if($rotid == 'agof_titel'){
+		$query = @mysql_query("SELECT visits Visits_Rubrik,uniqueuser uniqueuser_Rubrik,portfolio.Website,portfolio.Port_ID,'Titel-Rotation' Rubrik, PI PI_Rubrik,'agof-titel' RotName,'agof_titel' Linkname,'' Sublevel FROM portfolio WHERE portfolio.status='online' AND portfolio.agof = '1' ORDER BY Website;");
+	}
+	else {
+	  	$query = @mysql_query("SELECT ROUND(portfolio.visits*rubriken.PI_Rubrik/portfolio.PI) Visits_Rubrik,ROUND(portfolio.uniqueuser*rubriken.PI_Rubrik/portfolio.PI) uniqueuser_Rubrik,portfolio.Website,portfolio.Port_ID,rubriken.Rubrik,rubriken.PI_Rubrik,rotation.Name RotName,rotation.Linkname,rotation.Sublevel FROM rotation,rubriken,portfolio WHERE rubriken.Rot_ID=rotation.Rot_ID AND portfolio.Port_ID=rubriken.Port_ID AND portfolio.status='online' AND rotation.Linkname='".$rotid."' ORDER BY sort,Sublevel,Website,Rubrik");
+	}
+	$c = 0;
+	$r = 3;
+	while($row = @mysql_fetch_array($query))
+	{
+		if($rotid == 'agof_titel'){
+			$query3 = mysql_query("SELECT visits Visits_Rubrik,uniqueuser uniqueuser_Rubrik,portfolio.Website,portfolio.Port_ID,'Titel-Rotation' Rubrik, PI PI_Rubrik,'agof-titel' RotName,'agof_titel' Linkname,'' Sublevel FROM verticalnetwork,portfolio WHERE slave=Port_ID AND master='".$result[Port_ID]."'");
+			echo "agof ".$rotid,EOL;
+		}
+		//echo $row['Sublevel'],EOL;
+		if($subchannel!=$row['Sublevel'])
+		{
+			$c++;
+			$objPHPExcel->getActiveSheet()->getCellByColumnAndRow($c,$r)->setValue($row['Sublevel']);
+		}
+		
+		$c = 0;
+		if($portid!=$row['Port_ID'])
+		{
+			$portcount=0;
+			$objPHPExcel->getActiveSheet()->getCellByColumnAndRow($c,$r)->setValue($row['Website']);
+		}else{
+			$portcount++;
+			if($portcount2 && !$portcount)
+			{
+			}
+		}
+
+		$c++;		
+		$objPHPExcel->getActiveSheet()->getCellByColumnAndRow($c,$r)->setValue($row['Rubrik']);
+		if($show_imp || $rotid==45)
+		{
+			//$worksheet4->Cells($r,$c++)->value = $result[PI_Rubrik];
+			$c++;
+			$objPHPExcel->getActiveSheet()->getCellByColumnAndRow($c,$r)->setValue($row['PI_Rubrik']);
+		}
+		if($show_view && $rotid!=45)
+		{	
+			//$worksheet4->Cells($r,$c++)->value = $result[Visits_Rubrik];
+			$c++;
+			$objPHPExcel->getActiveSheet()->getCellByColumnAndRow($c,$r)->setValue($row['Visits_Rubrik']);
+		}
+		if($show_unique && $rotid!=45)
+		{
+			//$worksheet4->Cells($r,$c++)->value = $result[uniqueuser_Rubrik];
+			$c++;
+			$objPHPExcel->getActiveSheet()->getCellByColumnAndRow($c,$r)->setValue($row['uniqueuser_Rubrik']);
+
+			/*if(mysql_num_rows($query3)>0){
+				$worksheet4->Range($worksheet4->Cells($r,$c-1),$worksheet4->Cells($r+mysql_num_rows($query3),$c-1))->MergeCells = True;
+				$worksheet4->Range($worksheet4->Cells($r,$c-1),$worksheet4->Cells($r+mysql_num_rows($query3),$c-1))->VerticalAlignment = 2;
+			}*/
+		}
+		$c++;
+		$objPHPExcel->getActiveSheet()->getCellByColumnAndRow($c,$r)->setValue($row['Website']);
+		//change the data type of the cell
+		$objPHPExcel->getActiveSheet()->getCellByColumnAndRow($c,$r)->setDataType(PHPExcel_Cell_DataType::TYPE_STRING2);
+		//now set the link
+		$objPHPExcel->getActiveSheet()->getCellByColumnAndRow($c,$r)->getHyperlink()->setUrl(strip_tags('http://www.netpoint-media.de/portfolio/'.$row['Website'].'.html'));
+		
+		// Set url color
+		// Config
+		$link_style_array = array(
+			'font' => array(
+					'underline' => 'single',
+					'color' => array ('rgb' => '0000FF')
+			)
+		);
+		$colIndex = PHPExcel_Cell::stringFromColumnIndex($c);
+		$objPHPExcel->getActiveSheet()->getStyle($colIndex.$r)->applyFromArray($link_style_array);
+		
+		$r++;
+		//$c++;
+		$portcount2=$portcount;
+		$rotname=$row['RotName'];
+		$rotname2=$row['RotName'];
+		if(strlen($rotname)>31){
+			$rotname = substr($rotname,0,30).".";
+		}
+		$linkname=$row['Linkname'];
+		$subchannel=$row['Sublevel'];
+		$portid=$row['Port_ID'];
+		while($row3 = @mysql_fetch_array($query3))
+		{
+			print_r($row3);
+			if($subchannel!=$row3['Sublevel'])
+			{
+				$c++;
+				$objPHPExcel->getActiveSheet()->getCellByColumnAndRow($c,$r)->setValue($row3['Sublevel']);
+			}
+			
+			$c = 0;
+			if($portid!=$row3['Port_ID'])
+			{
+				$portcount=0;
+				$objPHPExcel->getActiveSheet()->getCellByColumnAndRow($c,$r)->setValue($row3['Website']);
+			}else{
+				$portcount++;
+				if($portcount2 && !$portcount)
+				{
+				}
+			}
+
+			$c++;		
+			$objPHPExcel->getActiveSheet()->getCellByColumnAndRow($c,$r)->setValue($row3['Rubrik']);
+			if($show_imp || $rotid==45)
+			{
+				//$worksheet4->Cells($r,$c++)->value = $result[PI_Rubrik];
+				$c++;
+				$objPHPExcel->getActiveSheet()->getCellByColumnAndRow($c,$r)->setValue($row3['PI_Rubrik']);
+			}
+			if($show_view && $rotid!=45)
+			{	
+				//$worksheet4->Cells($r,$c++)->value = $result[Visits_Rubrik];
+				$c++;
+				$objPHPExcel->getActiveSheet()->getCellByColumnAndRow($c,$r)->setValue($row3['Visits_Rubrik']);
+			}
+			if($show_unique && $rotid!=45)
+			{
+				//$worksheet4->Cells($r,$c++)->value = $result[uniqueuser_Rubrik];
+				$c++;
+				$objPHPExcel->getActiveSheet()->getCellByColumnAndRow($c,$r)->setValue($row3['uniqueuser_Rubrik']);
+
+				/*if(mysql_num_rows($query3)>0){
+					$worksheet4->Range($worksheet4->Cells($r,$c-1),$worksheet4->Cells($r+mysql_num_rows($query3),$c-1))->MergeCells = True;
+					$worksheet4->Range($worksheet4->Cells($r,$c-1),$worksheet4->Cells($r+mysql_num_rows($query3),$c-1))->VerticalAlignment = 2;
+				}*/
+			}
+			$c++;
+			$objPHPExcel->getActiveSheet()->getCellByColumnAndRow($c,$r)->setValue($row3['Website']);
+			//change the data type of the cell
+			$objPHPExcel->getActiveSheet()->getCellByColumnAndRow($c,$r)->setDataType(PHPExcel_Cell_DataType::TYPE_STRING2);
+			//now set the link
+			$objPHPExcel->getActiveSheet()->getCellByColumnAndRow($c,$r)->getHyperlink()->setUrl(strip_tags('http://www.netpoint-media.de/portfolio/'.$row3['Website'].'.html'));
+			
+			// Set url color
+			// Config
+			$link_style_array = array(
+				'font' => array(
+						'underline' => 'single',
+						'color' => array ('rgb' => '0000FF')
+				)
+			);
+			$colIndex = PHPExcel_Cell::stringFromColumnIndex($c);
+			$objPHPExcel->getActiveSheet()->getStyle($colIndex.$r)->applyFromArray($link_style_array);
+			
+			$r++;
+			$portcount2=$portcount;
+		}
+	}
+	//$objPHPExcel->setActiveSheetIndex($sheetEx);
+	$objPHPExcel->getActiveSheet()->setTitle($rotname);
+
+	$r++;
+	$c++;
+	//echo "Platzierung: ".$colIndex,EOL;
+	//$objPHPExcel->setActiveSheetIndex(6);
+	//$objPHPExcel->getActiveSheet()->setTitle("test");
 	/*$i = 5;
 	$j = 4;
 	$objPHPExcel = new PHPExcel();
@@ -537,10 +832,10 @@ function rotation($rotid,$show_imp = false,$show_view = false,$show_unique = fal
 echo "Impressions, Visits, Unique<br/>";
 flush();
 createxls(1,1,1,getcwd()."/excel/ivu.xlsx");
-flush();
+/*flush();
 echo "Impressions, Visits<br/>";
 createxls(1,1,0,getcwd()."/excel/iv.xlsx");
-flush();
+/*flush();
 echo "Impressions, Unique<br/>";
 createxls(1,0,1,getcwd()."/excel/iu.xlsx");
 flush();
@@ -555,5 +850,5 @@ createxls(0,1,0,getcwd()."/excel/v.xlsx");
 flush();
 echo "Unique<br/>";
 createxls(0,0,1,getcwd()."/excel/u.xlsx");
-echo "fertsch!";
+echo "fertsch!";*/
 ?>
