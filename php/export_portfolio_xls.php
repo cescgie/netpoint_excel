@@ -95,7 +95,7 @@ function createxls($show_imp = false,$show_view = false,$show_unique = false,	$s
 		  $objPHPExcel->getActiveSheet()->getColumnDimension('D')->setWidth(11);
 		  $objPHPExcel->getActiveSheet()->getRowDimension(1)->setRowHeight(36);
 
-			$objPHPExcel->getActiveSheet()->mergeCells('A2:D2');
+		  $objPHPExcel->getActiveSheet()->mergeCells('A2:D2');
 		  $objPHPExcel->getActiveSheet()->mergeCells('B3:D3');
 		  $objPHPExcel->getActiveSheet()->mergeCells('B4:D4');
 		  $objPHPExcel->getActiveSheet()->mergeCells('B5:D5');
@@ -193,6 +193,7 @@ function createxls($show_imp = false,$show_view = false,$show_unique = false,	$s
 			$center2 = array(
 				'alignment' => array(
 						'horizontal' => PHPExcel_Style_Alignment::HORIZONTAL_CENTER,
+						'vertical' => PHPExcel_Style_Alignment::VERTICAL_CENTER,
 				)
 			);
 			$objPHPExcel->getActiveSheet()->getStyle("C10:D56")->applyFromArray($center);
@@ -261,6 +262,7 @@ function createxls($show_imp = false,$show_view = false,$show_unique = false,	$s
 			$center = array(
 				'alignment' => array(
 						'horizontal' => PHPExcel_Style_Alignment::HORIZONTAL_CENTER,
+						'vertical' => PHPExcel_Style_Alignment::VERTICAL_CENTER,
 				)
 			);
 			$objPHPExcel->getActiveSheet()->getStyle("A2:E2")->applyFromArray($center);
@@ -278,16 +280,23 @@ function createxls($show_imp = false,$show_view = false,$show_unique = false,	$s
 				{
 					$c++;
 					$objPHPExcel->getActiveSheet()->getCellByColumnAndRow($c,$r)->setValue($row['PI']);
+					$colIndex = PHPExcel_Cell::stringFromColumnIndex($c);
+					$objPHPExcel->getActiveSheet()->getStyle($colIndex.$r)->getNumberFormat()->setFormatCode('###,###');
+
 				}
 				if($show_view)
 				{
 					$c++;
 					$objPHPExcel->getActiveSheet()->getCellByColumnAndRow($c,$r)->setValue($row['visits']);
+					$colIndex = PHPExcel_Cell::stringFromColumnIndex($c);
+					$objPHPExcel->getActiveSheet()->getStyle($colIndex.$r)->getNumberFormat()->setFormatCode('###,###');
 				}
 				if($show_unique)
 				{
 					$c++;
 					$objPHPExcel->getActiveSheet()->getCellByColumnAndRow($c,$r)->setValue($row['uniqueuser']);
+					$colIndex = PHPExcel_Cell::stringFromColumnIndex($c);
+					$objPHPExcel->getActiveSheet()->getStyle($colIndex.$r)->getNumberFormat()->setFormatCode('###,###');
 				}
 				$c++;
 				$objPHPExcel->getActiveSheet()->getCellByColumnAndRow($c,$r)->setValue($row['Website']);
@@ -346,7 +355,7 @@ function createxls($show_imp = false,$show_view = false,$show_unique = false,	$s
 
 			$styleUnderLine = array(
 				'font' => array(
-					'underline' => PHPExcel_Style_Font::UNDERLINE_DOUBLE
+					'underline' => PHPExcel_Style_Font::UNDERLINE_SINGLE
 				)
 			);
 
@@ -462,64 +471,6 @@ function createxls($show_imp = false,$show_view = false,$show_unique = false,	$s
 
 		}
 
-		//Add worksheet netpoint-rotation
-		/*$sheet5 = clone $clone;
-		$sheet5->setTitle('netpoint-rotation');
-		$objPHPExcel->addSheet($sheet5);
-
-		//Arbeitsblatt netpoint-rotation
-		$objPHPExcel->setActiveSheetIndex(6);
-		{
-			$objPHPExcel->getActiveSheet()->getRowDimension(1)->setRowHeight(36);
-			$objPHPExcel->getActiveSheet()->getRowDimension(2)->setRowHeight(25.5);
-
-			$styleArray = array(
-		    'font'  => array(
-		        'bold'  => false,
-		        'color' => array('rgb' => 'FFFFFF')
-		    ),
-				'fill' => array(
-		            'type' => PHPExcel_Style_Fill::FILL_SOLID,
-		            'color' => array('rgb' => '000000')
-		        ),
-				'borders' => array(
-				        'allborders' => array(
-				            'style' => PHPExcel_Style_Border::BORDER_THIN,
-										'color' => array('rgb' => 'FFFFFF')
-					          )
-				    )
-			);
-		  //$objPHPExcel->getActiveSheet()->getCell('A2')->setValue("SPEZIFIKATION & ADSERVER");
-		  $objPHPExcel->getActiveSheet()->getStyle('A2:G2')->applyFromArray($styleArray);
-
-			$objPHPExcel->getActiveSheet()->getColumnDimension('A')->setWidth(36);
-			$objPHPExcel->getActiveSheet()->getCell('A2')->setValue("Portfolio / Website");
-		  $objPHPExcel->getActiveSheet()->getColumnDimension('B')->setWidth(25);
-			$objPHPExcel->getActiveSheet()->getCell('B2')->setValue("Platzierung");
-			$objPHPExcel->getActiveSheet()->getStyle('B2')->getAlignment()->setWrapText(true);
-			$objPHPExcel->getActiveSheet()->getColumnDimension('C')->setWidth(16);
-			$objPHPExcel->getActiveSheet()->getCell('C2')->setValue("PageImpressions pro Monat");
-			$objPHPExcel->getActiveSheet()->getStyle('C2')->getAlignment()->setWrapText(true);
-		  $objPHPExcel->getActiveSheet()->getColumnDimension('D')->setWidth(16);
-			$objPHPExcel->getActiveSheet()->getCell('D2')->setValue("Visits pro Monat");
-			$objPHPExcel->getActiveSheet()->getColumnDimension('E')->setWidth(16);
-			$objPHPExcel->getActiveSheet()->getCell('E2')->setValue("Unique User pro Monat");
-			$objPHPExcel->getActiveSheet()->getStyle('E2')->getAlignment()->setWrapText(true);
-			$objPHPExcel->getActiveSheet()->getColumnDimension('F')->setWidth(35);
-			$objPHPExcel->getActiveSheet()->getCell('F2')->setValue("Website- & Zielgruppenbeschreibung");
-			$objPHPExcel->getActiveSheet()->getStyle('F2')->getAlignment()->setWrapText(true);
-		  $objPHPExcel->getActiveSheet()->getColumnDimension('G')->setWidth(35);
-			$objPHPExcel->getActiveSheet()->getCell('G2')->setValue("Channel-Beschreibung / Buchungsmöglichkeiten & Preise");
-			$objPHPExcel->getActiveSheet()->getStyle('G2')->getAlignment()->setWrapText(true);
-
-			$center = array(
-				'alignment' => array(
-						'horizontal' => PHPExcel_Style_Alignment::HORIZONTAL_CENTER,
-				)
-			);
-			$objPHPExcel->getActiveSheet()->getStyle("A2:G2")->applyFromArray($center);
-			
-		}*/
 		// Set active sheet index to the first sheet, so Excel opens this as the first sheet
 		$objPHPExcel->setActiveSheetIndex(1);
 
@@ -597,7 +548,7 @@ function rotation($sheetEx, $rotid,$show_imp = false,$show_view = false,$show_un
 		$c++;
 		$colIndex = PHPExcel_Cell::stringFromColumnIndex($c);
 		$objPHPExcel->getActiveSheet()->getColumnDimension($colIndex)->setWidth(16);
-		$objPHPExcel->getActiveSheet()->getCellByColumnAndRow($c,$r)->setValue("Visits               pro Monat");
+		$objPHPExcel->getActiveSheet()->getCellByColumnAndRow($c,$r)->setValue("Visits pro Monat");
 		$objPHPExcel->getActiveSheet()->getStyle($colIndex.$r)->getAlignment()->setWrapText(true);
 	}
 	if($show_unique && $rotid!=45)
@@ -605,7 +556,7 @@ function rotation($sheetEx, $rotid,$show_imp = false,$show_view = false,$show_un
 		$c++;
 		$colIndex = PHPExcel_Cell::stringFromColumnIndex($c);
 		$objPHPExcel->getActiveSheet()->getColumnDimension($colIndex)->setWidth(16);
-		$objPHPExcel->getActiveSheet()->getCellByColumnAndRow($c,$r)->setValue("Unique User               pro Monat");
+		$objPHPExcel->getActiveSheet()->getCellByColumnAndRow($c,$r)->setValue("Unique User pro Monat");
 		$objPHPExcel->getActiveSheet()->getStyle($colIndex.$r)->getAlignment()->setWrapText(true);
 	}
 	$c++;
@@ -617,14 +568,14 @@ function rotation($sheetEx, $rotid,$show_imp = false,$show_view = false,$show_un
 	$c++;
 	$colIndex = PHPExcel_Cell::stringFromColumnIndex($c);
 	$objPHPExcel->getActiveSheet()->getColumnDimension($colIndex)->setWidth(35);
-	$objPHPExcel->getActiveSheet()->getCellByColumnAndRow($c,$r)->setValue("Channel-Beschreibung / Buchungsmoeglichkeiten & Preise");
+	$objPHPExcel->getActiveSheet()->getCellByColumnAndRow($c,$r)->setValue("Channel-Beschreibung / Buchungsmöglichkeiten & Preise");
 	$objPHPExcel->getActiveSheet()->getStyle($colIndex.$r)->getAlignment()->setWrapText(true);
 
 	$styleArray = array(
-		    'font'  => array(
-		        'bold'  => false,
-		        'color' => array('rgb' => 'FFFFFF')
-		    ),
+		    	'font'  => array(
+		        	'bold'  => false,
+		        	'color' => array('rgb' => 'FFFFFF')
+		    	),
 				'fill' => array(
 		            'type' => PHPExcel_Style_Fill::FILL_SOLID,
 		            'color' => array('rgb' => '000000')
@@ -633,7 +584,11 @@ function rotation($sheetEx, $rotid,$show_imp = false,$show_view = false,$show_un
 				        'allborders' => array(
 				            'style' => PHPExcel_Style_Border::BORDER_THIN
 					          )
-				    )
+				    ),
+				'alignment' => array(
+						'horizontal' => PHPExcel_Style_Alignment::HORIZONTAL_CENTER,
+						'vertical' => PHPExcel_Style_Alignment::VERTICAL_CENTER,
+				)
 			);
 
 	$objPHPExcel->getActiveSheet()->getStyle("A2:".$colIndex."2")->applyFromArray($styleArray);
@@ -646,6 +601,7 @@ function rotation($sheetEx, $rotid,$show_imp = false,$show_view = false,$show_un
 	}
 	$c = 0;
 	$r = 3;
+	$counter = 0;
 	while($row = @mysql_fetch_array($query))
 	{
 		if($rotid == 'agof_titel'){
@@ -792,50 +748,91 @@ function rotation($sheetEx, $rotid,$show_imp = false,$show_view = false,$show_un
 			$r++;
 			$portcount2=$portcount;
 		}
+		$counter++;
 	}
 	//$objPHPExcel->setActiveSheetIndex($sheetEx);
 	$objPHPExcel->getActiveSheet()->setTitle($rotname);
 
 	$r++;
 	$c++;
-	//echo "Platzierung: ".$colIndex,EOL;
-	//$objPHPExcel->setActiveSheetIndex(6);
-	//$objPHPExcel->getActiveSheet()->setTitle("test");
-	/*$i = 5;
-	$j = 4;
-	$objPHPExcel = new PHPExcel();
 
-	// Set document properties
-	//echo date('H:i:s') , " Set document properties" , EOL;
-	$objPHPExcel->getProperties()->setCreator("netpoint-media")
-								 ->setLastModifiedBy("netpoint-media")
-								 ->setTitle("PHPExcel Test Document")
-								 ->setSubject("PHPExcel Test Document")
-								 ->setDescription("Test document for PHPExcel, generated using PHP classes.")
-								 ->setKeywords("office PHPExcel php")
-								 ->setCategory("Test result file");
+	$objPHPExcel->getActiveSheet()->getCellByColumnAndRow($c,3)->setValue($rotname2);
+	//change the data type of the cell
+	$objPHPExcel->getActiveSheet()->getCellByColumnAndRow($c,3)->setDataType(PHPExcel_Cell_DataType::TYPE_STRING2);
+	//now set the link
+	$objPHPExcel->getActiveSheet()->getCellByColumnAndRow($c,3)->getHyperlink()->setUrl(strip_tags('http://www.netpoint-media.de/rotation/'.$linkname.'.html'));
+	// Set url color
+	// Config
+	$link_style_array = array(
+		'font' => array(
+				'underline' => 'single',
+				'color' => array ('rgb' => '0000FF')
+		),
+		'alignment' => array(
+				'horizontal' => PHPExcel_Style_Alignment::HORIZONTAL_CENTER,
+				'vertical' => PHPExcel_Style_Alignment::VERTICAL_CENTER,
+		)
+	);
+	$colIndex = PHPExcel_Cell::stringFromColumnIndex($c);
+	$objPHPExcel->getActiveSheet()->getStyle($colIndex.'3')->applyFromArray($link_style_array);
 
-	$objPHPExcel2 = PHPExcel_IOFactory::load("excel/deckblatt.xlsx");
-	foreach ($objPHPExcel2->getAllSheets() as $worksheet) {
-			$objPHPExcel->AddExternalSheet($worksheet);
+	/* Grey Cells Background  */
+	$styleArray3 = array(
+		'fill' => array(
+			'type' => PHPExcel_Style_Fill::FILL_SOLID,
+		    'color' => array('rgb' => 'E8E8E8')
+	    ),
+		'borders' => array(
+	        'allborders' => array(
+	     		'style' => PHPExcel_Style_Border::BORDER_THIN,
+	            'color' => array('rgb' => 'FFFFFF')
+		          )
+			)
+	);
+	$maxrow = $counter + 2;
+	$colIndex = PHPExcel_Cell::stringFromColumnIndex($c);
+	$objPHPExcel->getActiveSheet()->getStyle("A3:".$colIndex.$maxrow)->applyFromArray($styleArray3);
+	
+	$objPHPExcel->getActiveSheet()->mergeCells($colIndex.'3:'.$colIndex.$maxrow);
+
+	$styleUnderLine = array(
+				'font' => array(
+					'underline' => PHPExcel_Style_Font::UNDERLINE_SINGLE
+				)
+			);
+
+	/* Summe */
+	$c = 1;
+	if($show_imp)
+	{
+		$c++;
+		$colIndex = PHPExcel_Cell::stringFromColumnIndex($c);
+		$objPHPExcel->getActiveSheet()->getCell($colIndex.($maxrow+1))->setValue('=SUM(C3:C'.$maxrow.')');
+		$objPHPExcel->getActiveSheet()->getStyle($colIndex.($maxrow+1))->applyFromArray($styleUnderLine);
 	}
-	//echo $rotid.'_'.$show_imp.'_'.$show_view.'_'.$show_unique,EOL;
-	$objPHPExcel->setActiveSheetIndex(2);
-	//Clone worksheet index 2
-	$sheet4 = $objPHPExcel->getActiveSheet()->copy();
-	//Add worksheet Portfolio
-	$sheet5 = clone $sheet4;
-	//$sheet2->setTitle($rotid);
-	$objPHPExcel->addSheet($sheet4);
-	$i++;*/
+	if($show_view)
+	{
+		$c++;
+		$colIndex = PHPExcel_Cell::stringFromColumnIndex($c);
+		$objPHPExcel->getActiveSheet()->getCell($colIndex.($maxrow+1))->setValue('=SUM(D3:D'.$maxrow.')');
+		$objPHPExcel->getActiveSheet()->getStyle($colIndex.($maxrow+1))->applyFromArray($styleUnderLine);
+	}
+	if($show_unique)
+	{
+		$c++;
+		$colIndex = PHPExcel_Cell::stringFromColumnIndex($c);
+		$objPHPExcel->getActiveSheet()->getCell($colIndex.($maxrow+1))->setValue('=SUM(E3:E'.$maxrow.')');
+		$objPHPExcel->getActiveSheet()->getStyle($colIndex.($maxrow+1))->applyFromArray($styleUnderLine);
+	}
+
 }
 echo "Impressions, Visits, Unique<br/>";
 flush();
 createxls(1,1,1,getcwd()."/excel/ivu.xlsx");
-/*flush();
+flush();
 echo "Impressions, Visits<br/>";
 createxls(1,1,0,getcwd()."/excel/iv.xlsx");
-/*flush();
+flush();
 echo "Impressions, Unique<br/>";
 createxls(1,0,1,getcwd()."/excel/iu.xlsx");
 flush();
@@ -850,5 +847,5 @@ createxls(0,1,0,getcwd()."/excel/v.xlsx");
 flush();
 echo "Unique<br/>";
 createxls(0,0,1,getcwd()."/excel/u.xlsx");
-echo "fertsch!";*/
+echo "fertsch!";
 ?>
