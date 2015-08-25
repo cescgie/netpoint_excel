@@ -19,7 +19,6 @@ if (!$db_selected) {
 	die ('Kann netpoint_online nicht benutzen : ' . mysql_error());
 }
 
-
 //ToDo
 function createxls($show_imp = false,$show_view = false,$show_unique = false,	$strPath)
 {
@@ -45,20 +44,14 @@ function createxls($show_imp = false,$show_view = false,$show_unique = false,	$s
 		$objPHPExcel->setActiveSheetIndex(2);
 		//Clone worksheet index 2
 		$sheet2 = $objPHPExcel->getActiveSheet()->copy();
-		//Add worksheet Portfolio
-		$sheet3 = clone $sheet2;
-		$sheet3->setTitle('Portfolio');
-		$objPHPExcel->addSheet($sheet3);
-		//Add worksheet Channel
-		$sheet4 = clone $sheet2;
-		$sheet4->setTitle('Channel');
-		$objPHPExcel->addSheet($sheet4);
-		//Add worksheet netpoint-rotation
-		$sheet5 = clone $sheet2;
-		$sheet5->setTitle('netpoint-rotation');
-		$objPHPExcel->addSheet($sheet5);
+
+		//Add Clone worksheet
+		$clone = clone $sheet2;
+		$clone->setTitle('clone');
+		$objPHPExcel->addSheet($clone);
 
 		//Arbeitsblatt technik
+		$objPHPExcel->setActiveSheetIndex(2);
 		{
 		  $objPHPExcel->getActiveSheet()->getColumnDimension('A')->setWidth(36);
 		  $objPHPExcel->getActiveSheet()->getColumnDimension('B')->setWidth(58);
@@ -185,8 +178,13 @@ function createxls($show_imp = false,$show_view = false,$show_unique = false,	$s
 
 		}
 
+		//Add worksheet Portfolio
+		$sheet3 = clone $clone;
+		$sheet3->setTitle('Portfolio');
+		$objPHPExcel->addSheet($sheet3);
+
 		//Arbeitsblatt Portfolio
-		$objPHPExcel->setActiveSheetIndex(3);
+		$objPHPExcel->setActiveSheetIndex(4);
 		{
 			$objPHPExcel->getActiveSheet()->getRowDimension(1)->setRowHeight(36);
 			$objPHPExcel->getActiveSheet()->getRowDimension(2)->setRowHeight(25.5);
@@ -341,8 +339,13 @@ function createxls($show_imp = false,$show_view = false,$show_unique = false,	$s
 			}
 		}
 
+		//Add worksheet netpoint-rotation
+		$sheet5 = clone $clone;
+		$sheet5->setTitle('Channel');
+		$objPHPExcel->addSheet($sheet5);
+
 		//Arbeitsblatt Channel
-		$objPHPExcel->setActiveSheetIndex(4);
+		$objPHPExcel->setActiveSheetIndex(5);
 		{
 			$objPHPExcel->getActiveSheet()->getRowDimension(1)->setRowHeight(36);
 			$objPHPExcel->getActiveSheet()->getColumnDimension('A')->setWidth(36);
@@ -396,6 +399,9 @@ function createxls($show_imp = false,$show_view = false,$show_unique = false,	$s
 
 				$counter++;
 				$r++;
+				//print_r($row['Linkname']);
+				//echo $show_imp,EOL,$show_view,EOL,$show_unique,EOL;
+				//rotation($row['Linkname'],$show_imp,$show_view,$show_unique);
 			}
 			$styleArray2 = array(
 				'fill' => array(
@@ -411,10 +417,16 @@ function createxls($show_imp = false,$show_view = false,$show_unique = false,	$s
 			);
 			$maxrow = $counter + 2;
 			$objPHPExcel->getActiveSheet()->getStyle("A3:B".$maxrow)->applyFromArray($styleArray2);
+
 		}
 
+		//Add worksheet netpoint-rotation
+		$sheet6 = clone $clone;
+		$sheet6->setTitle('netpoint-rotation');
+		$objPHPExcel->addSheet($sheet6);
+
 		//Arbeitsblatt netpoint-rotation
-		$objPHPExcel->setActiveSheetIndex(5);
+		$objPHPExcel->setActiveSheetIndex(6);
 		{
 			$objPHPExcel->getActiveSheet()->getRowDimension(1)->setRowHeight(36);
 			$objPHPExcel->getActiveSheet()->getRowDimension(2)->setRowHeight(25.5);
@@ -464,12 +476,15 @@ function createxls($show_imp = false,$show_view = false,$show_unique = false,	$s
 				)
 			);
 			$objPHPExcel->getActiveSheet()->getStyle("A2:G2")->applyFromArray($center);
+
 		}
 		// Set active sheet index to the first sheet, so Excel opens this as the first sheet
 		$objPHPExcel->setActiveSheetIndex(1);
 
 		//Remove default worksheet
 		$objPHPExcel->removeSheetByIndex(0);
+		//Hide worksheet clone
+		$objPHPExcel->getSheetByName('clone')->setSheetState(PHPExcel_Worksheet::SHEETSTATE_VERYHIDDEN);
 
 		// Save Excel 2007 file
 		$objWriter = PHPExcel_IOFactory::createWriter($objPHPExcel, 'Excel2007');
@@ -485,6 +500,33 @@ function createxls($show_imp = false,$show_view = false,$show_unique = false,	$s
 }
 function rotation($rotid,$show_imp = false,$show_view = false,$show_unique = false)
 {
+	/*$i = 5;
+	$j = 4;
+	$objPHPExcel = new PHPExcel();
+
+	// Set document properties
+	//echo date('H:i:s') , " Set document properties" , EOL;
+	$objPHPExcel->getProperties()->setCreator("netpoint-media")
+								 ->setLastModifiedBy("netpoint-media")
+								 ->setTitle("PHPExcel Test Document")
+								 ->setSubject("PHPExcel Test Document")
+								 ->setDescription("Test document for PHPExcel, generated using PHP classes.")
+								 ->setKeywords("office PHPExcel php")
+								 ->setCategory("Test result file");
+
+	$objPHPExcel2 = PHPExcel_IOFactory::load("excel/deckblatt.xlsx");
+	foreach ($objPHPExcel2->getAllSheets() as $worksheet) {
+			$objPHPExcel->AddExternalSheet($worksheet);
+	}
+	//echo $rotid.'_'.$show_imp.'_'.$show_view.'_'.$show_unique,EOL;
+	$objPHPExcel->setActiveSheetIndex(2);
+	//Clone worksheet index 2
+	$sheet4 = $objPHPExcel->getActiveSheet()->copy();
+	//Add worksheet Portfolio
+	$sheet5 = clone $sheet4;
+	//$sheet2->setTitle($rotid);
+	$objPHPExcel->addSheet($sheet4);
+	$i++;*/
 }
 echo "Impressions, Visits, Unique<br/>";
 flush();
