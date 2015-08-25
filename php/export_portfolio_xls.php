@@ -18,38 +18,40 @@ $db_selected = mysql_select_db('netpoint_media', $conn);
 if (!$db_selected) {
 	die ('Kann netpoint_online nicht benutzen : ' . mysql_error());
 }
+// Create new PHPExcel object
+//echo date('H:i:s') , " Create new PHPExcel object" , EOL;
+$objPHPExcel = new PHPExcel();
+
+// Set document properties
+//echo date('H:i:s') , " Set document properties" , EOL;
+$objPHPExcel->getProperties()->setCreator("netpoint-media")
+							 ->setLastModifiedBy("netpoint-media")
+							 ->setTitle("PHPExcel Test Document")
+							 ->setSubject("PHPExcel Test Document")
+							 ->setDescription("Test document for PHPExcel, generated using PHP classes.")
+							 ->setKeywords("office PHPExcel php")
+							 ->setCategory("Test result file");
+
+$objPHPExcel2 = PHPExcel_IOFactory::load("excel/deckblatt.xlsx");
+foreach ($objPHPExcel2->getAllSheets() as $worksheet) {
+		$objPHPExcel->AddExternalSheet($worksheet);
+}
+
+$objPHPExcel->setActiveSheetIndex(2);
+//Clone worksheet index 2
+$sheet2 = $objPHPExcel->getActiveSheet()->copy();
+
+//Add Clone worksheet
+$clone = clone $sheet2;
+$clone->setTitle('clone');
+$objPHPExcel->addSheet($clone);
+
 
 //ToDo
 function createxls($show_imp = false,$show_view = false,$show_unique = false,	$strPath)
 {
-		// Create new PHPExcel object
-		//echo date('H:i:s') , " Create new PHPExcel object" , EOL;
-		$objPHPExcel = new PHPExcel();
-
-		// Set document properties
-		//echo date('H:i:s') , " Set document properties" , EOL;
-		$objPHPExcel->getProperties()->setCreator("netpoint-media")
-									 ->setLastModifiedBy("netpoint-media")
-									 ->setTitle("PHPExcel Test Document")
-									 ->setSubject("PHPExcel Test Document")
-									 ->setDescription("Test document for PHPExcel, generated using PHP classes.")
-									 ->setKeywords("office PHPExcel php")
-									 ->setCategory("Test result file");
-
-		$objPHPExcel2 = PHPExcel_IOFactory::load("excel/deckblatt.xlsx");
-		foreach ($objPHPExcel2->getAllSheets() as $worksheet) {
-				$objPHPExcel->AddExternalSheet($worksheet);
-		}
-
-		$objPHPExcel->setActiveSheetIndex(2);
-		//Clone worksheet index 2
-		$sheet2 = $objPHPExcel->getActiveSheet()->copy();
-
-		//Add Clone worksheet
-		$clone = clone $sheet2;
-		$clone->setTitle('clone');
-		$objPHPExcel->addSheet($clone);
-
+		global $objPHPExcel;
+		global $clone;
 		//Arbeitsblatt technik
 		$objPHPExcel->setActiveSheetIndex(2);
 		{
@@ -340,9 +342,9 @@ function createxls($show_imp = false,$show_view = false,$show_unique = false,	$s
 		}
 
 		//Add worksheet netpoint-rotation
-		$sheet5 = clone $clone;
-		$sheet5->setTitle('Channel');
-		$objPHPExcel->addSheet($sheet5);
+		$sheet4 = clone $clone;
+		$sheet4->setTitle('Channel');
+		$objPHPExcel->addSheet($sheet4);
 
 		//Arbeitsblatt Channel
 		$objPHPExcel->setActiveSheetIndex(5);
@@ -421,9 +423,9 @@ function createxls($show_imp = false,$show_view = false,$show_unique = false,	$s
 		}
 
 		//Add worksheet netpoint-rotation
-		$sheet6 = clone $clone;
-		$sheet6->setTitle('netpoint-rotation');
-		$objPHPExcel->addSheet($sheet6);
+		$sheet5 = clone $clone;
+		$sheet5->setTitle('netpoint-rotation');
+		$objPHPExcel->addSheet($sheet5);
 
 		//Arbeitsblatt netpoint-rotation
 		$objPHPExcel->setActiveSheetIndex(6);
@@ -483,8 +485,12 @@ function createxls($show_imp = false,$show_view = false,$show_unique = false,	$s
 
 		//Remove default worksheet
 		$objPHPExcel->removeSheetByIndex(0);
+
 		//Hide worksheet clone
-		$objPHPExcel->getSheetByName('clone')->setSheetState(PHPExcel_Worksheet::SHEETSTATE_VERYHIDDEN);
+		if($objPHPExcel->getSheetByName('clone'))
+		{
+			$objPHPExcel->getSheetByName('clone')->setSheetState(PHPExcel_Worksheet::SHEETSTATE_VERYHIDDEN);
+		}
 
 		// Save Excel 2007 file
 		$objWriter = PHPExcel_IOFactory::createWriter($objPHPExcel, 'Excel2007');
