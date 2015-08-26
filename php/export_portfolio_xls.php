@@ -281,7 +281,7 @@ function createxls($show_imp = false,$show_view = false,$show_unique = false,	$s
 					$c++;
 					$objPHPExcel->getActiveSheet()->getCellByColumnAndRow($c,$r)->setValue($row['PI']);
 					$colIndex = PHPExcel_Cell::stringFromColumnIndex($c);
-					$objPHPExcel->getActiveSheet()->getStyle($colIndex.$r)->getNumberFormat()->setFormatCode('###,###');
+					$objPHPExcel->getActiveSheet()->getStyle($colIndex.$r)->getNumberFormat()->setFormatCode('#,###');
 
 				}
 				if($show_view)
@@ -289,14 +289,14 @@ function createxls($show_imp = false,$show_view = false,$show_unique = false,	$s
 					$c++;
 					$objPHPExcel->getActiveSheet()->getCellByColumnAndRow($c,$r)->setValue($row['visits']);
 					$colIndex = PHPExcel_Cell::stringFromColumnIndex($c);
-					$objPHPExcel->getActiveSheet()->getStyle($colIndex.$r)->getNumberFormat()->setFormatCode('###,###');
+					$objPHPExcel->getActiveSheet()->getStyle($colIndex.$r)->getNumberFormat()->setFormatCode('#,###');
 				}
 				if($show_unique)
 				{
 					$c++;
 					$objPHPExcel->getActiveSheet()->getCellByColumnAndRow($c,$r)->setValue($row['uniqueuser']);
 					$colIndex = PHPExcel_Cell::stringFromColumnIndex($c);
-					$objPHPExcel->getActiveSheet()->getStyle($colIndex.$r)->getNumberFormat()->setFormatCode('###,###');
+					$objPHPExcel->getActiveSheet()->getStyle($colIndex.$r)->getNumberFormat()->setFormatCode('#,###');
 				}
 				$c++;
 				$objPHPExcel->getActiveSheet()->getCellByColumnAndRow($c,$r)->setValue($row['Website']);
@@ -365,22 +365,25 @@ function createxls($show_imp = false,$show_view = false,$show_unique = false,	$s
 			{
 				$c++;
 				$colIndex = PHPExcel_Cell::stringFromColumnIndex($c);
-				$objPHPExcel->getActiveSheet()->getCell($colIndex.($maxrow+1))->setValue('=SUM(B3:B'.$maxrow.')');
+				$objPHPExcel->getActiveSheet()->getCell($colIndex.($maxrow+1))->setValue('=SUM('.$colIndex.'3:'.$colIndex.$maxrow.')');
 				$objPHPExcel->getActiveSheet()->getStyle($colIndex.($maxrow+1))->applyFromArray($styleUnderLine);
+				$objPHPExcel->getActiveSheet()->getStyle($colIndex.($maxrow+1))->getNumberFormat()->setFormatCode('#,###');
 			}
 			if($show_view)
 			{
 				$c++;
 				$colIndex = PHPExcel_Cell::stringFromColumnIndex($c);
-				$objPHPExcel->getActiveSheet()->getCell($colIndex.($maxrow+1))->setValue('=SUM(C3:B'.$maxrow.')');
+				$objPHPExcel->getActiveSheet()->getCell($colIndex.($maxrow+1))->setValue('=SUM('.$colIndex.'3:'.$colIndex.$maxrow.')');
 				$objPHPExcel->getActiveSheet()->getStyle($colIndex.($maxrow+1))->applyFromArray($styleUnderLine);
+				$objPHPExcel->getActiveSheet()->getStyle($colIndex.($maxrow+1))->getNumberFormat()->setFormatCode('#,###');
 			}
 			if($show_unique)
 			{
 				$c++;
 				$colIndex = PHPExcel_Cell::stringFromColumnIndex($c);
-				$objPHPExcel->getActiveSheet()->getCell($colIndex.($maxrow+1))->setValue('=SUM(D3:B'.$maxrow.')');
+				$objPHPExcel->getActiveSheet()->getCell($colIndex.($maxrow+1))->setValue('=SUM('.$colIndex.'3:'.$colIndex.$maxrow.')');
 				$objPHPExcel->getActiveSheet()->getStyle($colIndex.($maxrow+1))->applyFromArray($styleUnderLine);
+				$objPHPExcel->getActiveSheet()->getStyle($colIndex.($maxrow+1))->getNumberFormat()->setFormatCode('#,###');
 			}
 		}
 
@@ -504,10 +507,10 @@ function rotation($sheetEx, $rotid,$show_imp = false,$show_view = false,$show_un
 	global $portid;
 	global $portcount2;
 	global $portcount;
-	
+
 	//echo "rotid ".$rotid,EOL;
 
-	//Add worksheet netpoint-rotation	
+	//Add worksheet netpoint-rotation
 	$sheet5 = clone $clone;
 	$sheet5->setTitle("Worksheet");
 	$objPHPExcel->addSheet($sheet5);
@@ -524,7 +527,7 @@ function rotation($sheetEx, $rotid,$show_imp = false,$show_view = false,$show_un
 	$objPHPExcel->getActiveSheet()->getColumnDimension($colIndex)->setWidth(36);
 	$objPHPExcel->getActiveSheet()->getCellByColumnAndRow($c,$r)->setValue("Portfolio / Website");
 	//echo "Portfolio / Website: ".$colIndex,EOL;
-	
+
 	$c++;
 	$colIndex = PHPExcel_Cell::stringFromColumnIndex($c);
 	$objPHPExcel->getActiveSheet()->getColumnDimension($colIndex)->setWidth(25);
@@ -614,7 +617,7 @@ function rotation($sheetEx, $rotid,$show_imp = false,$show_view = false,$show_un
 			$c++;
 			$objPHPExcel->getActiveSheet()->getCellByColumnAndRow($c,$r)->setValue($row['Sublevel']);
 		}
-		
+
 		$c = 0;
 		if($portid!=$row['Port_ID'])
 		{
@@ -627,25 +630,31 @@ function rotation($sheetEx, $rotid,$show_imp = false,$show_view = false,$show_un
 			}
 		}
 
-		$c++;		
+		$c++;
 		$objPHPExcel->getActiveSheet()->getCellByColumnAndRow($c,$r)->setValue($row['Rubrik']);
 		if($show_imp || $rotid==45)
 		{
 			//$worksheet4->Cells($r,$c++)->value = $result[PI_Rubrik];
 			$c++;
 			$objPHPExcel->getActiveSheet()->getCellByColumnAndRow($c,$r)->setValue($row['PI_Rubrik']);
+			$colIndex = PHPExcel_Cell::stringFromColumnIndex($c);
+			$objPHPExcel->getActiveSheet()->getStyle($colIndex.$r)->getNumberFormat()->setFormatCode('#,###');
 		}
 		if($show_view && $rotid!=45)
-		{	
+		{
 			//$worksheet4->Cells($r,$c++)->value = $result[Visits_Rubrik];
 			$c++;
 			$objPHPExcel->getActiveSheet()->getCellByColumnAndRow($c,$r)->setValue($row['Visits_Rubrik']);
+			$colIndex = PHPExcel_Cell::stringFromColumnIndex($c);
+			$objPHPExcel->getActiveSheet()->getStyle($colIndex.$r)->getNumberFormat()->setFormatCode('#,###');
 		}
 		if($show_unique && $rotid!=45)
 		{
 			//$worksheet4->Cells($r,$c++)->value = $result[uniqueuser_Rubrik];
 			$c++;
 			$objPHPExcel->getActiveSheet()->getCellByColumnAndRow($c,$r)->setValue($row['uniqueuser_Rubrik']);
+			$colIndex = PHPExcel_Cell::stringFromColumnIndex($c);
+			$objPHPExcel->getActiveSheet()->getStyle($colIndex.$r)->getNumberFormat()->setFormatCode('#,###');
 
 			/*if(mysql_num_rows($query3)>0){
 				$worksheet4->Range($worksheet4->Cells($r,$c-1),$worksheet4->Cells($r+mysql_num_rows($query3),$c-1))->MergeCells = True;
@@ -658,7 +667,7 @@ function rotation($sheetEx, $rotid,$show_imp = false,$show_view = false,$show_un
 		$objPHPExcel->getActiveSheet()->getCellByColumnAndRow($c,$r)->setDataType(PHPExcel_Cell_DataType::TYPE_STRING2);
 		//now set the link
 		$objPHPExcel->getActiveSheet()->getCellByColumnAndRow($c,$r)->getHyperlink()->setUrl(strip_tags('http://www.netpoint-media.de/portfolio/'.$row['Website'].'.html'));
-		
+
 		// Set url color
 		// Config
 		$link_style_array = array(
@@ -669,7 +678,7 @@ function rotation($sheetEx, $rotid,$show_imp = false,$show_view = false,$show_un
 		);
 		$colIndex = PHPExcel_Cell::stringFromColumnIndex($c);
 		$objPHPExcel->getActiveSheet()->getStyle($colIndex.$r)->applyFromArray($link_style_array);
-		
+
 		$r++;
 		//$c++;
 		$portcount2=$portcount;
@@ -689,7 +698,7 @@ function rotation($sheetEx, $rotid,$show_imp = false,$show_view = false,$show_un
 				$c++;
 				$objPHPExcel->getActiveSheet()->getCellByColumnAndRow($c,$r)->setValue($row3['Sublevel']);
 			}
-			
+
 			$c = 0;
 			if($portid!=$row3['Port_ID'])
 			{
@@ -702,26 +711,31 @@ function rotation($sheetEx, $rotid,$show_imp = false,$show_view = false,$show_un
 				}
 			}
 
-			$c++;		
+			$c++;
 			$objPHPExcel->getActiveSheet()->getCellByColumnAndRow($c,$r)->setValue($row3['Rubrik']);
 			if($show_imp || $rotid==45)
 			{
 				//$worksheet4->Cells($r,$c++)->value = $result[PI_Rubrik];
 				$c++;
 				$objPHPExcel->getActiveSheet()->getCellByColumnAndRow($c,$r)->setValue($row3['PI_Rubrik']);
+				$colIndex = PHPExcel_Cell::stringFromColumnIndex($c);
+				$objPHPExcel->getActiveSheet()->getStyle($colIndex.$r)->getNumberFormat()->setFormatCode('#,###');
 			}
 			if($show_view && $rotid!=45)
-			{	
+			{
 				//$worksheet4->Cells($r,$c++)->value = $result[Visits_Rubrik];
 				$c++;
 				$objPHPExcel->getActiveSheet()->getCellByColumnAndRow($c,$r)->setValue($row3['Visits_Rubrik']);
+				$colIndex = PHPExcel_Cell::stringFromColumnIndex($c);
+				$objPHPExcel->getActiveSheet()->getStyle($colIndex.$r)->getNumberFormat()->setFormatCode('#,###');
 			}
 			if($show_unique && $rotid!=45)
 			{
 				//$worksheet4->Cells($r,$c++)->value = $result[uniqueuser_Rubrik];
 				$c++;
 				$objPHPExcel->getActiveSheet()->getCellByColumnAndRow($c,$r)->setValue($row3['uniqueuser_Rubrik']);
-
+				$colIndex = PHPExcel_Cell::stringFromColumnIndex($c);
+				$objPHPExcel->getActiveSheet()->getStyle($colIndex.$r)->getNumberFormat()->setFormatCode('#,###');
 				/*if(mysql_num_rows($query3)>0){
 					$worksheet4->Range($worksheet4->Cells($r,$c-1),$worksheet4->Cells($r+mysql_num_rows($query3),$c-1))->MergeCells = True;
 					$worksheet4->Range($worksheet4->Cells($r,$c-1),$worksheet4->Cells($r+mysql_num_rows($query3),$c-1))->VerticalAlignment = 2;
@@ -733,7 +747,7 @@ function rotation($sheetEx, $rotid,$show_imp = false,$show_view = false,$show_un
 			$objPHPExcel->getActiveSheet()->getCellByColumnAndRow($c,$r)->setDataType(PHPExcel_Cell_DataType::TYPE_STRING2);
 			//now set the link
 			$objPHPExcel->getActiveSheet()->getCellByColumnAndRow($c,$r)->getHyperlink()->setUrl(strip_tags('http://www.netpoint-media.de/portfolio/'.$row3['Website'].'.html'));
-			
+
 			// Set url color
 			// Config
 			$link_style_array = array(
@@ -744,7 +758,7 @@ function rotation($sheetEx, $rotid,$show_imp = false,$show_view = false,$show_un
 			);
 			$colIndex = PHPExcel_Cell::stringFromColumnIndex($c);
 			$objPHPExcel->getActiveSheet()->getStyle($colIndex.$r)->applyFromArray($link_style_array);
-			
+
 			$r++;
 			$portcount2=$portcount;
 		}
@@ -792,7 +806,7 @@ function rotation($sheetEx, $rotid,$show_imp = false,$show_view = false,$show_un
 	$maxrow = $counter + 2;
 	$colIndex = PHPExcel_Cell::stringFromColumnIndex($c);
 	$objPHPExcel->getActiveSheet()->getStyle("A3:".$colIndex.$maxrow)->applyFromArray($styleArray3);
-	
+
 	$objPHPExcel->getActiveSheet()->mergeCells($colIndex.'3:'.$colIndex.$maxrow);
 
 	$styleUnderLine = array(
@@ -807,35 +821,37 @@ function rotation($sheetEx, $rotid,$show_imp = false,$show_view = false,$show_un
 	{
 		$c++;
 		$colIndex = PHPExcel_Cell::stringFromColumnIndex($c);
-		$objPHPExcel->getActiveSheet()->getCell($colIndex.($maxrow+1))->setValue('=SUM(C3:C'.$maxrow.')');
+		$objPHPExcel->getActiveSheet()->getCell($colIndex.($maxrow+1))->setValue('=SUM('.$colIndex.'3:'.$colIndex.$maxrow.')');
 		$objPHPExcel->getActiveSheet()->getStyle($colIndex.($maxrow+1))->applyFromArray($styleUnderLine);
+		$objPHPExcel->getActiveSheet()->getStyle($colIndex.($maxrow+1))->getNumberFormat()->setFormatCode('#,###');
 	}
 	if($show_view)
 	{
 		$c++;
 		$colIndex = PHPExcel_Cell::stringFromColumnIndex($c);
-		$objPHPExcel->getActiveSheet()->getCell($colIndex.($maxrow+1))->setValue('=SUM(D3:D'.$maxrow.')');
+		$objPHPExcel->getActiveSheet()->getCell($colIndex.($maxrow+1))->setValue('=SUM('.$colIndex.'3:'.$colIndex.$maxrow.')');
 		$objPHPExcel->getActiveSheet()->getStyle($colIndex.($maxrow+1))->applyFromArray($styleUnderLine);
+		$objPHPExcel->getActiveSheet()->getStyle($colIndex.($maxrow+1))->getNumberFormat()->setFormatCode('#,###');
 	}
 	if($show_unique)
 	{
 		$c++;
 		$colIndex = PHPExcel_Cell::stringFromColumnIndex($c);
-		$objPHPExcel->getActiveSheet()->getCell($colIndex.($maxrow+1))->setValue('=SUM(E3:E'.$maxrow.')');
+		$objPHPExcel->getActiveSheet()->getCell($colIndex.($maxrow+1))->setValue('=SUM('.$colIndex.'3:'.$colIndex.$maxrow.')');
 		$objPHPExcel->getActiveSheet()->getStyle($colIndex.($maxrow+1))->applyFromArray($styleUnderLine);
+		$objPHPExcel->getActiveSheet()->getStyle($colIndex.($maxrow+1))->getNumberFormat()->setFormatCode('#,###');
 	}
-
 }
 echo "Impressions, Visits, Unique<br/>";
 flush();
 createxls(1,1,1,getcwd()."/excel/ivu.xlsx");
-flush();
+/*flush();
 echo "Impressions, Visits<br/>";
-createxls(1,1,0,getcwd()."/excel/iv.xlsx");
+createxls(1,1,0,getcwd()."/excel/iv.xlsx");*/
 flush();
 echo "Impressions, Unique<br/>";
 createxls(1,0,1,getcwd()."/excel/iu.xlsx");
-flush();
+/*flush();
 echo "Visits, Unique<br/>";
 createxls(0,1,1,getcwd()."/excel/vu.xlsx");
 flush();
@@ -847,5 +863,5 @@ createxls(0,1,0,getcwd()."/excel/v.xlsx");
 flush();
 echo "Unique<br/>";
 createxls(0,0,1,getcwd()."/excel/u.xlsx");
-echo "fertsch!";
+echo "fertsch!";*/
 ?>
