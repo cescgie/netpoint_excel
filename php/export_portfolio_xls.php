@@ -15,11 +15,9 @@ require_once '../tools/PHPExcel/Classes/PHPExcel/IOFactory.php';
 require_once("inc_db.php");
 
 // Create new PHPExcel object
-//echo date('H:i:s') , " Create new PHPExcel object" , EOL;
 $objPHPExcel = new PHPExcel();
 
 // Set document properties
-//echo date('H:i:s') , " Set document properties" , EOL;
 $objPHPExcel->getProperties()->setCreator("netpoint-media")
 							 ->setLastModifiedBy("netpoint-media")
 							 ->setTitle("PHPExcel Test Document")
@@ -34,7 +32,7 @@ foreach ($objPHPExcel2->getAllSheets() as $worksheet) {
 }
 
 $objPHPExcel->setActiveSheetIndex(2);
-//Clone worksheet index 2
+//Clone worksheet
 $sheet2 = $objPHPExcel->getActiveSheet()->copy();
 
 //Add Clone worksheet
@@ -48,13 +46,64 @@ $portid = null;
 $portcount2 = null;
 $portcount = null;
 
-//ToDo
+/* Style */
+$linkStyle = array(
+	'font' => array(
+			'underline' => 'single',
+			'color' => array ('rgb' => '0000FF')
+	)
+);
+
+$menuStyle = array(
+	'font'  => array(
+			'bold'  => false,
+			'color' => array('rgb' => 'FFFFFF')
+	),
+	'fill' => array(
+					'type' => PHPExcel_Style_Fill::FILL_SOLID,
+					'color' => array('rgb' => '000000')
+			),
+	'borders' => array(
+					'allborders' => array(
+							'style' => PHPExcel_Style_Border::BORDER_THIN
+							)
+			)
+);
+$greyCellBackroundStyle = array(
+	'fill' => array(
+					'type' => PHPExcel_Style_Fill::FILL_SOLID,
+					'color' => array('rgb' => 'E8E8E8')
+			),
+	'borders' => array(
+					'allborders' => array(
+							'style' => PHPExcel_Style_Border::BORDER_THIN,
+							'color' => array('rgb' => 'FFFFFF')
+							)
+	)
+);
+$center = array(
+	'alignment' => array(
+			'horizontal' => PHPExcel_Style_Alignment::HORIZONTAL_CENTER,
+			'vertical' => PHPExcel_Style_Alignment::VERTICAL_CENTER,
+	)
+);
+$styleUnderLine = array(
+			'font' => array(
+				'underline' => PHPExcel_Style_Font::UNDERLINE_SINGLE
+			)
+);
+
 function createxls($show_imp = false,$show_view = false,$show_unique = false,	$strPath)
 {
 		global $objPHPExcel;
 		global $clone;
 		global $status;
 		global $sheetEx;
+		global $linkStyle;
+		global $menuStyle;
+		global $greyCellBackroundStyle;
+		global $center;
+		global $styleUnderLine;
 
 		if($status==false){
 			//echo "status: false",EOL;
@@ -103,23 +152,9 @@ function createxls($show_imp = false,$show_view = false,$show_unique = false,	$s
 		  $objPHPExcel->getActiveSheet()->mergeCells('B8:D8');
 		  $objPHPExcel->getActiveSheet()->mergeCells('A8:A9');
 
-			$styleArray = array(
-		    'font'  => array(
-		        'bold'  => false,
-		        'color' => array('rgb' => 'FFFFFF')
-		    ),
-				'fill' => array(
-		            'type' => PHPExcel_Style_Fill::FILL_SOLID,
-		            'color' => array('rgb' => '000000')
-		        ),
-				'borders' => array(
-				        'allborders' => array(
-				            'style' => PHPExcel_Style_Border::BORDER_THIN
-					          )
-				    )
-			);
 		  $objPHPExcel->getActiveSheet()->getCell('A2')->setValue("SPEZIFIKATION & ADSERVER");
-		  $objPHPExcel->getActiveSheet()->getStyle('A2:D2')->applyFromArray($styleArray);
+		  $objPHPExcel->getActiveSheet()->getStyle('A2:D2')->applyFromArray($menuStyle);
+			$objPHPExcel->getActiveSheet()->getStyle('A2:D2')->applyFromArray($center);
 
 			$r = 2;
 			$r++;
@@ -129,7 +164,8 @@ function createxls($show_imp = false,$show_view = false,$show_unique = false,	$s
 
 			$r++;
 			$objPHPExcel->getActiveSheet()->getCell('A'.$r)->setValue("SPEZIFIKATIONEN DER WICHTIGSTEN STANDARD-FORMATE");
-			$objPHPExcel->getActiveSheet()->getStyle('A7:D7')->applyFromArray($styleArray);
+			$objPHPExcel->getActiveSheet()->getStyle('A7:D7')->applyFromArray($menuStyle);
+			$objPHPExcel->getActiveSheet()->getStyle('A2:D2')->applyFromArray($center);
 
 			$r++;
 			$objPHPExcel->getActiveSheet()->getCell('A'.$r)->setValue("Format");
@@ -149,14 +185,7 @@ function createxls($show_imp = false,$show_view = false,$show_unique = false,	$s
 			//now set the link
 			$objPHPExcel->getActiveSheet()->getCell('B'.$r)->getHyperlink()->setUrl(strip_tags("mailto:banner@netpoint-media.de"));
 			// Set url color
-			// Config
-			$link_style_array = array(
-				'font' => array(
-						'underline' => 'single',
-						'color' => array ('rgb' => '0000FF')
-				)
-			);
-			$objPHPExcel->getActiveSheet()->getStyle('B'.$r)->applyFromArray($link_style_array);
+			$objPHPExcel->getActiveSheet()->getStyle('B'.$r)->applyFromArray($linkStyle);
 
 			$r++;
 			$objPHPExcel->getActiveSheet()->getCell('B'.$r)->setValue("ADTECH HELIOS IQ");
@@ -167,15 +196,6 @@ function createxls($show_imp = false,$show_view = false,$show_unique = false,	$s
 			$objPHPExcel->getActiveSheet()->getCell('C9')->setValue("GIF, JPG");
 			$objPHPExcel->getActiveSheet()->getCell('D9')->setValue("Flash");
 
-			$center = array(
-				'font'  => array(
-		        'bold'  => true,
-		        'color' => array('rgb' => '000000')
-		    ),
-				'alignment' => array(
-						'horizontal' => PHPExcel_Style_Alignment::HORIZONTAL_CENTER,
-				)
-			);
 			$objPHPExcel->getActiveSheet()->getStyle("A8:D9")->applyFromArray($center);
 
 			$result = mysql_query("SELECT * FROM werbeformen WHERE werbeformen.online = '1' ORDER BY werbeformen.sort");
@@ -190,28 +210,10 @@ function createxls($show_imp = false,$show_view = false,$show_unique = false,	$s
 				$counter++;
 			}
 
-			$center2 = array(
-				'alignment' => array(
-						'horizontal' => PHPExcel_Style_Alignment::HORIZONTAL_CENTER,
-						'vertical' => PHPExcel_Style_Alignment::VERTICAL_CENTER,
-				)
-			);
 			$objPHPExcel->getActiveSheet()->getStyle("C10:D56")->applyFromArray($center);
 
-			$styleArray2 = array(
-				'fill' => array(
-		            'type' => PHPExcel_Style_Fill::FILL_SOLID,
-		            'color' => array('rgb' => 'E8E8E8')
-		        ),
-				'borders' => array(
-				        'allborders' => array(
-				        		'style' => PHPExcel_Style_Border::BORDER_THIN,
-		                'color' => array('rgb' => 'FFFFFF')
-					          )
-				)
-			);
 			$maxrow = $counter + 10;
-			$objPHPExcel->getActiveSheet()->getStyle("A8:D".$maxrow)->applyFromArray($styleArray2);
+			$objPHPExcel->getActiveSheet()->getStyle("A8:D".$maxrow)->applyFromArray($greyCellBackroundStyle);
 
 		}
 
@@ -259,12 +261,6 @@ function createxls($show_imp = false,$show_view = false,$show_unique = false,	$s
 			$objPHPExcel->getActiveSheet()->getCellByColumnAndRow($c,$r)->setValue("Website- & Zielgruppenbeschreibung / Buchungsmöglichkeiten & Preise");
 			$objPHPExcel->getActiveSheet()->getStyle($colIndex.$r)->getAlignment()->setWrapText(true);
 
-			$center = array(
-				'alignment' => array(
-						'horizontal' => PHPExcel_Style_Alignment::HORIZONTAL_CENTER,
-						'vertical' => PHPExcel_Style_Alignment::VERTICAL_CENTER,
-				)
-			);
 			$objPHPExcel->getActiveSheet()->getStyle("A2:E2")->applyFromArray($center);
 
 			$result = mysql_query("SELECT * FROM portfolio WHERE portfolio.status = 'online' ORDER BY Website");
@@ -305,59 +301,17 @@ function createxls($show_imp = false,$show_view = false,$show_unique = false,	$s
 				//now set the link
 				$objPHPExcel->getActiveSheet()->getCellByColumnAndRow($c,$r)->getHyperlink()->setUrl(strip_tags('http://www.netpoint-media.de/portfolio/'.$row['Website'].'.html'));
 				// Set url color
-				// Config
-				$link_style_array = array(
-					'font' => array(
-							'underline' => 'single',
-							'color' => array ('rgb' => '0000FF')
-					)
-				);
 				$colIndex = PHPExcel_Cell::stringFromColumnIndex($c);
-				$objPHPExcel->getActiveSheet()->getStyle($colIndex.$r)->applyFromArray($link_style_array);
+				$objPHPExcel->getActiveSheet()->getStyle($colIndex.$r)->applyFromArray($linkStyle);
 				$r++;
 				$counter++;
 			}
-			/* Grey Cells Background  */
-			$styleArray2 = array(
-				'fill' => array(
-		            'type' => PHPExcel_Style_Fill::FILL_SOLID,
-		            'color' => array('rgb' => 'E8E8E8')
-		        ),
-				'borders' => array(
-				        'allborders' => array(
-				        		'style' => PHPExcel_Style_Border::BORDER_THIN,
-		                'color' => array('rgb' => 'FFFFFF')
-					          )
-				)
-			);
 			$maxrow = $counter + 2;
 			$colIndex = PHPExcel_Cell::stringFromColumnIndex($c);
-			$objPHPExcel->getActiveSheet()->getStyle("A3:".$colIndex.$maxrow)->applyFromArray($styleArray2);
+			$objPHPExcel->getActiveSheet()->getStyle("A3:".$colIndex.$maxrow)->applyFromArray($greyCellBackroundStyle);
 
-			/* Schwarze Menu  */
-			$styleArray = array(
-		    'font'  => array(
-		        'bold'  => false,
-		        'color' => array('rgb' => 'FFFFFF')
-		    ),
-				'fill' => array(
-		            'type' => PHPExcel_Style_Fill::FILL_SOLID,
-		            'color' => array('rgb' => '000000')
-		        ),
-				'borders' => array(
-				        'allborders' => array(
-				            'style' => PHPExcel_Style_Border::BORDER_THIN,
-										'color' => array('rgb' => 'FFFFFF')
-					          )
-				    )
-			);
-		 	$objPHPExcel->getActiveSheet()->getStyle('A2:'.$colIndex.'2')->applyFromArray($styleArray);
-
-			$styleUnderLine = array(
-				'font' => array(
-					'underline' => PHPExcel_Style_Font::UNDERLINE_SINGLE
-				)
-			);
+		 	$objPHPExcel->getActiveSheet()->getStyle('A2:'.$colIndex.'2')->applyFromArray($menuStyle);
+			$objPHPExcel->getActiveSheet()->getStyle('A2:'.$colIndex.'2')->applyFromArray($center);
 
 			/* Summe */
 			$c = 0;
@@ -398,28 +352,14 @@ function createxls($show_imp = false,$show_view = false,$show_unique = false,	$s
 			$objPHPExcel->getActiveSheet()->getRowDimension(1)->setRowHeight(36);
 			$objPHPExcel->getActiveSheet()->getRowDimension(2)->setRowHeight(25.5);
 			$objPHPExcel->getActiveSheet()->getColumnDimension('A')->setWidth(36);
-		  	$objPHPExcel->getActiveSheet()->getColumnDimension('B')->setWidth(16);
-		  	$objPHPExcel->getActiveSheet()->getColumnDimension('C')->setWidth(9);
-		  	$objPHPExcel->getActiveSheet()->getColumnDimension('D')->setWidth(22);
+		  $objPHPExcel->getActiveSheet()->getColumnDimension('B')->setWidth(16);
+		  $objPHPExcel->getActiveSheet()->getColumnDimension('C')->setWidth(9);
+		  $objPHPExcel->getActiveSheet()->getColumnDimension('D')->setWidth(22);
 
-			$styleArray = array(
-		    'font'  => array(
-		        'bold'  => false,
-		        'color' => array('rgb' => 'FFFFFF')
-		    ),
-				'fill' => array(
-		            'type' => PHPExcel_Style_Fill::FILL_SOLID,
-		            'color' => array('rgb' => '000000')
-		        ),
-				'borders' => array(
-				        'allborders' => array(
-				            'style' => PHPExcel_Style_Border::BORDER_THIN
-					          )
-				    )
-			);
-		  	$objPHPExcel->getActiveSheet()->getCell('A2')->setValue('Themen-Rotation');
+		  $objPHPExcel->getActiveSheet()->getCell('A2')->setValue('Themen-Rotation');
 			$objPHPExcel->getActiveSheet()->getCell('B2')->setValue('PI in Mio. / Monat');
-		  	$objPHPExcel->getActiveSheet()->getStyle('A2:B2')->applyFromArray($styleArray);
+		  $objPHPExcel->getActiveSheet()->getStyle('A2:B2')->applyFromArray($menuStyle);
+			$objPHPExcel->getActiveSheet()->getStyle('A2:B2')->applyFromArray($center);
 
 			$result = mysql_query("SELECT SUM(PI_Rubrik) sum,Name,Linkname,vermarktung,Website,portfolio.status,rotation.Linkname FROM rotation,rubriken,portfolio WHERE Art='thema' AND portfolio.Port_ID=rubriken.Port_ID AND portfolio.status='online' AND rubriken.Rot_ID=rotation.Rot_ID AND rotation.Name NOT LIKE '%_neu_%' AND rotation.status = '1' GROUP BY Name");
 
@@ -438,14 +378,7 @@ function createxls($show_imp = false,$show_view = false,$show_unique = false,	$s
 				//now set the link
 				$objPHPExcel->getActiveSheet()->getCell('A'.$r)->getHyperlink()->setUrl(strip_tags('http://www.netpoint-media.de/rotation/'.$row['Linkname'].'.html'));
 				// Set url color
-				// Config
-				$link_style_array = array(
-					'font' => array(
-							'underline' => 'single',
-							'color' => array ('rgb' => '0000FF')
-					)
-				);
-				$objPHPExcel->getActiveSheet()->getStyle('A'.$r)->applyFromArray($link_style_array);
+				$objPHPExcel->getActiveSheet()->getStyle('A'.$r)->applyFromArray($linkStyle);
 
 				$objPHPExcel->getActiveSheet()->getCell('B'.$r)->setValue(round($row['sum']/1000000,2));
 
@@ -457,20 +390,9 @@ function createxls($show_imp = false,$show_view = false,$show_unique = false,	$s
 				$sheetEx++;
 			}
 			$objPHPExcel->setActiveSheetIndex(5);
-			$styleArray2 = array(
-				'fill' => array(
-		            'type' => PHPExcel_Style_Fill::FILL_SOLID,
-		            'color' => array('rgb' => 'E8E8E8')
-		        ),
-				'borders' => array(
-				        'allborders' => array(
-				        		'style' => PHPExcel_Style_Border::BORDER_THIN,
-		                'color' => array('rgb' => 'FFFFFF')
-					          )
-				)
-			);
+
 			$maxrow = $counter + 2;
-			$objPHPExcel->getActiveSheet()->getStyle("A3:B".$maxrow)->applyFromArray($styleArray2);
+			$objPHPExcel->getActiveSheet()->getStyle("A3:B".$maxrow)->applyFromArray($greyCellBackroundStyle);
 
 		}
 
@@ -507,8 +429,11 @@ function rotation($sheetEx, $rotid,$show_imp = false,$show_view = false,$show_un
 	global $portid;
 	global $portcount2;
 	global $portcount;
-
-	//echo "rotid ".$rotid,EOL;
+	global $menuStyle;
+	global $linkStyle;
+	global $greyCellBackroundStyle;
+	global $styleUnderLine;
+	global $center;
 
 	//Add worksheet netpoint-rotation
 	$sheet5 = clone $clone;
@@ -574,27 +499,8 @@ function rotation($sheetEx, $rotid,$show_imp = false,$show_view = false,$show_un
 	$objPHPExcel->getActiveSheet()->getCellByColumnAndRow($c,$r)->setValue("Channel-Beschreibung / Buchungsmöglichkeiten & Preise");
 	$objPHPExcel->getActiveSheet()->getStyle($colIndex.$r)->getAlignment()->setWrapText(true);
 
-	$styleArray = array(
-		    	'font'  => array(
-		        	'bold'  => false,
-		        	'color' => array('rgb' => 'FFFFFF')
-		    	),
-				'fill' => array(
-		            'type' => PHPExcel_Style_Fill::FILL_SOLID,
-		            'color' => array('rgb' => '000000')
-		        ),
-				'borders' => array(
-				        'allborders' => array(
-				            'style' => PHPExcel_Style_Border::BORDER_THIN
-					          )
-				    ),
-				'alignment' => array(
-						'horizontal' => PHPExcel_Style_Alignment::HORIZONTAL_CENTER,
-						'vertical' => PHPExcel_Style_Alignment::VERTICAL_CENTER,
-				)
-			);
-
-	$objPHPExcel->getActiveSheet()->getStyle("A2:".$colIndex."2")->applyFromArray($styleArray);
+	$objPHPExcel->getActiveSheet()->getStyle("A2:".$colIndex."2")->applyFromArray($menuStyle);
+	$objPHPExcel->getActiveSheet()->getStyle("A2:".$colIndex."2")->applyFromArray($center);
 
 	if($rotid == 'agof_titel'){
 		$query = @mysql_query("SELECT visits Visits_Rubrik,uniqueuser uniqueuser_Rubrik,portfolio.Website,portfolio.Port_ID,'Titel-Rotation' Rubrik, PI PI_Rubrik,'agof-titel' RotName,'agof_titel' Linkname,'' Sublevel FROM portfolio WHERE portfolio.status='online' AND portfolio.agof = '1' ORDER BY Website;");
@@ -669,15 +575,8 @@ function rotation($sheetEx, $rotid,$show_imp = false,$show_view = false,$show_un
 		$objPHPExcel->getActiveSheet()->getCellByColumnAndRow($c,$r)->getHyperlink()->setUrl(strip_tags('http://www.netpoint-media.de/portfolio/'.$row['Website'].'.html'));
 
 		// Set url color
-		// Config
-		$link_style_array = array(
-			'font' => array(
-					'underline' => 'single',
-					'color' => array ('rgb' => '0000FF')
-			)
-		);
 		$colIndex = PHPExcel_Cell::stringFromColumnIndex($c);
-		$objPHPExcel->getActiveSheet()->getStyle($colIndex.$r)->applyFromArray($link_style_array);
+		$objPHPExcel->getActiveSheet()->getStyle($colIndex.$r)->applyFromArray($linkStyle);
 
 		$r++;
 		//$c++;
@@ -749,15 +648,8 @@ function rotation($sheetEx, $rotid,$show_imp = false,$show_view = false,$show_un
 			$objPHPExcel->getActiveSheet()->getCellByColumnAndRow($c,$r)->getHyperlink()->setUrl(strip_tags('http://www.netpoint-media.de/portfolio/'.$row3['Website'].'.html'));
 
 			// Set url color
-			// Config
-			$link_style_array = array(
-				'font' => array(
-						'underline' => 'single',
-						'color' => array ('rgb' => '0000FF')
-				)
-			);
 			$colIndex = PHPExcel_Cell::stringFromColumnIndex($c);
-			$objPHPExcel->getActiveSheet()->getStyle($colIndex.$r)->applyFromArray($link_style_array);
+			$objPHPExcel->getActiveSheet()->getStyle($colIndex.$r)->applyFromArray($linkStyle);
 
 			$r++;
 			$portcount2=$portcount;
@@ -776,44 +668,15 @@ function rotation($sheetEx, $rotid,$show_imp = false,$show_view = false,$show_un
 	//now set the link
 	$objPHPExcel->getActiveSheet()->getCellByColumnAndRow($c,3)->getHyperlink()->setUrl(strip_tags('http://www.netpoint-media.de/rotation/'.$linkname.'.html'));
 	// Set url color
-	// Config
-	$link_style_array = array(
-		'font' => array(
-				'underline' => 'single',
-				'color' => array ('rgb' => '0000FF')
-		),
-		'alignment' => array(
-				'horizontal' => PHPExcel_Style_Alignment::HORIZONTAL_CENTER,
-				'vertical' => PHPExcel_Style_Alignment::VERTICAL_CENTER,
-		)
-	);
 	$colIndex = PHPExcel_Cell::stringFromColumnIndex($c);
-	$objPHPExcel->getActiveSheet()->getStyle($colIndex.'3')->applyFromArray($link_style_array);
+	$objPHPExcel->getActiveSheet()->getStyle($colIndex.'3')->applyFromArray($linkStyle);
+	$objPHPExcel->getActiveSheet()->getStyle($colIndex.'3')->applyFromArray($center);
 
-	/* Grey Cells Background  */
-	$styleArray3 = array(
-		'fill' => array(
-			'type' => PHPExcel_Style_Fill::FILL_SOLID,
-		    'color' => array('rgb' => 'E8E8E8')
-	    ),
-		'borders' => array(
-	        'allborders' => array(
-	     		'style' => PHPExcel_Style_Border::BORDER_THIN,
-	            'color' => array('rgb' => 'FFFFFF')
-		          )
-			)
-	);
 	$maxrow = $counter + 2;
 	$colIndex = PHPExcel_Cell::stringFromColumnIndex($c);
-	$objPHPExcel->getActiveSheet()->getStyle("A3:".$colIndex.$maxrow)->applyFromArray($styleArray3);
+	$objPHPExcel->getActiveSheet()->getStyle("A3:".$colIndex.$maxrow)->applyFromArray($greyCellBackroundStyle);
 
 	$objPHPExcel->getActiveSheet()->mergeCells($colIndex.'3:'.$colIndex.$maxrow);
-
-	$styleUnderLine = array(
-				'font' => array(
-					'underline' => PHPExcel_Style_Font::UNDERLINE_SINGLE
-				)
-			);
 
 	/* Summe */
 	$c = 1;
@@ -840,7 +703,9 @@ function rotation($sheetEx, $rotid,$show_imp = false,$show_view = false,$show_un
 		$objPHPExcel->getActiveSheet()->getCell($colIndex.($maxrow+1))->setValue('=SUM('.$colIndex.'3:'.$colIndex.$maxrow.')');
 		$objPHPExcel->getActiveSheet()->getStyle($colIndex.($maxrow+1))->applyFromArray($styleUnderLine);
 		$objPHPExcel->getActiveSheet()->getStyle($colIndex.($maxrow+1))->getNumberFormat()->setFormatCode('#,###');
+
 	}
+
 }
 echo "Impressions, Visits, Unique<br/>";
 flush();
