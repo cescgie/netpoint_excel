@@ -205,7 +205,7 @@ function createxls($show_imp = false,$show_view = false,$show_unique = false,	$s
 			while($row = @mysql_fetch_array($result))
 			{
 				$objPHPExcel->getActiveSheet()->getCell('A'.$r++)->setValue($row['name']);
-				$objPHPExcel->getActiveSheet()->getCell('B'.$r)->setValue($row['format']);
+				$objPHPExcel->getActiveSheet()->getCell('B'.($r-1))->setValue($row['format']);
 				$objPHPExcel->getActiveSheet()->getCell('C'.($r-1))->setValue($row['gew']);
 				$objPHPExcel->getActiveSheet()->getCell('D'.($r-1))->setValue($row['gewflash']);
 				$counter++;
@@ -213,14 +213,14 @@ function createxls($show_imp = false,$show_view = false,$show_unique = false,	$s
 
 			$objPHPExcel->getActiveSheet()->getStyle("C10:D56")->applyFromArray($center);
 
-			$maxrow = $counter + 10;
+			$maxrow = $counter + 9;
 			$objPHPExcel->getActiveSheet()->getStyle("A8:D".$maxrow)->applyFromArray($greyCellBackroundStyle);
 
 		}
 
 		//Add worksheet Portfolio
 		$sheet3 = clone $clone;
-		$sheet3->setTitle('Portfolio');
+		$sheet3->setTitle('portfolio');
 		$objPHPExcel->addSheet($sheet3);
 
 		//Arbeitsblatt Portfolio
@@ -344,7 +344,7 @@ function createxls($show_imp = false,$show_view = false,$show_unique = false,	$s
 
 		//Add worksheet netpoint-rotation
 		$sheet4 = clone $clone;
-		$sheet4->setTitle('Channel');
+		$sheet4->setTitle('channel');
 		$objPHPExcel->addSheet($sheet4);
 
 		//Arbeitsblatt Channel
@@ -667,7 +667,7 @@ function rotation($sheetEx, $rotid,$show_imp = false,$show_view = false,$show_un
 	//change the data type of the cell
 	$objPHPExcel->getActiveSheet()->getCellByColumnAndRow($c,3)->setDataType(PHPExcel_Cell_DataType::TYPE_STRING2);
 	//now set the link
-	$objPHPExcel->getActiveSheet()->getCellByColumnAndRow($c,3)->getHyperlink()->setUrl(strip_tags('http://www.netpoint-media.de/rotation/'.$linkname.'.html'));
+	$objPHPExcel->getActiveSheet()->getCellByColumnAndRow($c,3)->getHyperlink()->setUrl(strip_tags('http://www.netpoint-media.de/portfolio/verticals/'.$linkname));
 	// Set url color
 	$colIndex = PHPExcel_Cell::stringFromColumnIndex($c);
 	$objPHPExcel->getActiveSheet()->getStyle($colIndex.'3')->applyFromArray($linkStyle);
