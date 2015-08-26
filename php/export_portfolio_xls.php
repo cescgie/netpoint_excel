@@ -1,6 +1,7 @@
 <?php
 /** Error reporting */
 error_reporting(E_ALL);
+ini_set('max_execution_time',6000);
 ini_set('display_errors', TRUE);
 ini_set('display_startup_errors', TRUE);
 date_default_timezone_set('Europe/London');
@@ -710,13 +711,13 @@ function rotation($sheetEx, $rotid,$show_imp = false,$show_view = false,$show_un
 echo "Impressions, Visits, Unique<br/>";
 flush();
 createxls(1,1,1,getcwd()."/excel/ivu.xlsx");
-/*flush();
+flush();
 echo "Impressions, Visits<br/>";
-createxls(1,1,0,getcwd()."/excel/iv.xlsx");*/
+createxls(1,1,0,getcwd()."/excel/iv.xlsx");
 flush();
 echo "Impressions, Unique<br/>";
 createxls(1,0,1,getcwd()."/excel/iu.xlsx");
-/*flush();
+flush();
 echo "Visits, Unique<br/>";
 createxls(0,1,1,getcwd()."/excel/vu.xlsx");
 flush();
@@ -728,5 +729,5 @@ createxls(0,1,0,getcwd()."/excel/v.xlsx");
 flush();
 echo "Unique<br/>";
 createxls(0,0,1,getcwd()."/excel/u.xlsx");
-echo "fertsch!";*/
+echo "fertsch!";
 ?>
