@@ -51,18 +51,20 @@ $portcount = null;
 $linkStyle = array(
 	'font' => array(
 			'underline' => 'single',
-			'color' => array ('rgb' => '0000FF')
+			'color' => array ('rgb' => '0000FF'),
+			'name' 	=> getSchriftart()
 	)
 );
 
 $menuStyle = array(
 	'font'  => array(
 			'bold'  => false,
-			'color' => array('rgb' => 'FFFFFF')
+			'color' => array('rgb' => 'FFFFFF'),
+			'name' 	=> getSchriftart()
 	),
 	'fill' => array(
 					'type' => PHPExcel_Style_Fill::FILL_SOLID,
-					'color' => array('rgb' => '000000')
+					'color' => array('rgb' => getMenuColor())
 			),
 	'borders' => array(
 					'allborders' => array(
@@ -80,6 +82,9 @@ $greyCellBackroundStyle = array(
 							'style' => PHPExcel_Style_Border::BORDER_THIN,
 							'color' => array('rgb' => 'FFFFFF')
 							)
+	),
+	'font' => array(
+		'name' 	=> getSchriftart()
 	)
 );
 $center = array(
@@ -90,10 +95,15 @@ $center = array(
 );
 $styleUnderLine = array(
 			'font' => array(
-				'underline' => PHPExcel_Style_Font::UNDERLINE_SINGLE
+				'underline' => PHPExcel_Style_Font::UNDERLINE_SINGLE,
+				'name' 	=> getSchriftart()
 			)
 );
-
+$addFont = array(
+			'font' => array(
+				'name' 	=> getSchriftart()
+			)
+);
 function createxls($show_imp = false,$show_view = false,$show_unique = false,	$strPath)
 {
 		global $objPHPExcel;
@@ -105,6 +115,7 @@ function createxls($show_imp = false,$show_view = false,$show_unique = false,	$s
 		global $greyCellBackroundStyle;
 		global $center;
 		global $styleUnderLine;
+		global $addFont;
 
 		if($status==false){
 			//echo "status: false",EOL;
@@ -197,6 +208,7 @@ function createxls($show_imp = false,$show_view = false,$show_unique = false,	$s
 			$objPHPExcel->getActiveSheet()->getCell('C9')->setValue("GIF, JPG");
 			$objPHPExcel->getActiveSheet()->getCell('D9')->setValue("Flash");
 
+			$objPHPExcel->getActiveSheet()->getStyle("A3:D6")->applyFromArray($addFont);
 			$objPHPExcel->getActiveSheet()->getStyle("A8:D9")->applyFromArray($center);
 
 			$result = mysql_query("SELECT * FROM werbeformen WHERE werbeformen.online = '1' ORDER BY werbeformen.sort");
@@ -706,8 +718,18 @@ function rotation($sheetEx, $rotid,$show_imp = false,$show_view = false,$show_un
 		$objPHPExcel->getActiveSheet()->getStyle($colIndex.($maxrow+1))->getNumberFormat()->setFormatCode('#,###');
 
 	}
-
 }
+function getSchriftart(){
+	global $objPHPExcel;
+	$font = $objPHPExcel->getSheetByName('kontaktdaten')->getStyle("B3")->getFont()->getName();
+	return $font;
+}
+function getMenuColor(){
+	global $objPHPExcel;
+	$color = $objPHPExcel->getSheetByName('kontaktdaten')->getStyle('B3')->getFill()->getStartColor()->getRGB();
+	return $color;
+}
+
 echo "Impressions, Visits, Unique<br/>";
 flush();
 createxls(1,1,1,getcwd()."/excel/ivu.xlsx");
@@ -730,4 +752,5 @@ flush();
 echo "Unique<br/>";
 createxls(0,0,1,getcwd()."/excel/u.xlsx");
 echo "fertsch!";
+
 ?>
